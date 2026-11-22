@@ -45,6 +45,14 @@ _FORECAST_TTL = 15 * 60  # seconds
 _forecasts: dict[tuple[float, float], tuple[float, dict]] = {}
 
 
+def _prune_expired_forecasts() -> None:
+    """Evict forecast cache entries older than 2x TTL to bound memory footprint."""
+    now = time.time()
+    expired = [k for k, (ts, _) in _forecasts.items() if now - ts > _FORECAST_TTL * 2]
+    for k in expired:
+        _forecasts.pop(k, None)
+
+
 _COORDS = re.compile(r"^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$")
 
 
@@ -251,6 +259,7 @@ def _forecast(lat: float, lon: float) -> Optional[dict]:
         return hit[1]
     data = _fetch_forecast(lat, lon) or _fetch_met_norway(lat, lon)
     if data is not None:
+        _prune_expired_forecasts()
         if len(_forecasts) > 512:
             _forecasts.clear()
         _forecasts[key] = (time.time(), data)
