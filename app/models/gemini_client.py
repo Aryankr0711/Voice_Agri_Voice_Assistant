@@ -144,9 +144,11 @@ class GeminiClient:
                     elif exc.kind == "rate_limit":
                         waits.append(exc.retry_after or 2.0)
 
-            # All models failed — if they were rate-limited wait once and retry.
-            if attempt == 0 and last and last.kind == "rate_limit" and waits and 0 < min(waits) <= 6:
-                time.sleep(min(waits))
+            # All models failed — if they were rate-limited wait with exponential backoff and retry.
+            if attempt == 0 and last and last.kind == "rate_limit" and waits:
+                delay = min(max(min(waits), 1.0), 6.0)
+                logger.info("Gemini rate limited; waiting %.1fs before secondary attempt.", delay)
+                time.sleep(delay)
                 continue
             break
 
