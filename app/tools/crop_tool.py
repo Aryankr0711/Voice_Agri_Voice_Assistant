@@ -27,6 +27,7 @@ def _find_stage(crop_data: dict, days: Optional[int]) -> Optional[dict]:
     """Return the growth stage dict that matches the given day count."""
     if days is None:
         return None
+    days = max(days, 0)
     for stage in crop_data.get("stages", []):
         lo, hi = stage["days_range"]
         if lo <= days <= hi:
