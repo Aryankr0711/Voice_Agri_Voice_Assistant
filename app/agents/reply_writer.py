@@ -53,6 +53,7 @@ def clean_for_speech(text: str) -> str:
     text = re.sub(r"^\s*[-•●▪]\s*", "", text, flags=re.M)
     text = "".join(ch for ch in text if not (0x1F000 <= ord(ch) <= 0x1FAFF
                                              or 0x2600 <= ord(ch) <= 0x27BF))
+    text = re.sub(r"\s+([,।\.\?!])", r"\1", text)
     return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
