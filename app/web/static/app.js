@@ -585,6 +585,9 @@ async function copyText(text) {
     document.execCommand("copy");
     area.remove();
   }
+  try {
+    if (navigator.vibrate) navigator.vibrate(35);
+  } catch (_) {}
   toast(`✓ ${t("web_copied")}`, 1800);
 }
 
