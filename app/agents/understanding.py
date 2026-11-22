@@ -358,9 +358,10 @@ def understand_with_llm(client, text: str, lang: str, saved_location: Optional[s
 def understand(text: str, lang: str, saved_location: Optional[str] = None,
                pending: Optional[dict] = None, client=None,
                english: Optional[str] = None) -> Understanding:
-    """Understand the farmer's words. `client` is a GroqClient (LLM engine) or
-    None (rules). `pending` is the earlier question when the assistant asked
-    for a missing detail; `english` is an English translation, if one exists."""
+    """Understand the farmer's words. `client` is a UnifiedLLMClient/GroqClient
+    (LLM engine) or None (rules). `pending` is the earlier question when the assistant
+    asked for a missing detail; `english` is an English translation, if one exists."""
+    text = re.sub(r"\s+", " ", (text or "").strip())
     rules = understand_with_rules(text, english, saved_location, lang)
     missing = list((pending or {}).get("missing") or [])
 
