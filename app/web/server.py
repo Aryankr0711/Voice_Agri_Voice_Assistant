@@ -200,8 +200,9 @@ def create_app(with_classic: bool = True) -> FastAPI:
     @app.get("/api/health")
     def health():
         from app.ui.gradio_app import _mode_info
+        from app.config import get_active_providers
         return {"status": "ok", "mode": _mode_info(), "voice": VOICE_READY,
-                "languages": list(LANG_CODES)}
+                "languages": list(LANG_CODES), "providers": get_active_providers()}
 
     @app.get("/api/config")
     def config():
