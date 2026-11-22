@@ -32,6 +32,19 @@ class UnifiedLLMClient:
         self._gemini = gemini
         self.last_model: Optional[str] = None
         self.last_provider: Optional[str] = None
+        self.groq_calls: int = 0
+        self.gemini_fallbacks: int = 0
+
+    def get_status(self) -> dict:
+        """Return diagnostic health and call distribution across providers."""
+        return {
+            "groq_configured": self._groq is not None,
+            "gemini_configured": self._gemini is not None,
+            "last_provider": self.last_provider,
+            "last_model": self.last_model,
+            "groq_calls": self.groq_calls,
+            "gemini_fallbacks": self.gemini_fallbacks,
+        }
 
     # ── Chat ──────────────────────────────────────────────────────────────────
     def chat(
@@ -56,6 +69,7 @@ class UnifiedLLMClient:
                 )
                 self.last_model = self._groq.last_model
                 self.last_provider = "groq"
+                self.groq_calls += 1
                 return result
             except Exception as exc:
                 last_exc = exc
@@ -76,6 +90,7 @@ class UnifiedLLMClient:
                 )
                 self.last_model = self._gemini.last_model
                 self.last_provider = "gemini"
+                self.gemini_fallbacks += 1
                 return result
             except Exception as exc:
                 last_exc = exc
