@@ -43,7 +43,10 @@ OTHER_CROPS: dict[str, tuple[str, ...]] = {
     "capsicum": ("capsicum", "shimla mirch", "शिमला मिर्च", "ढोबळी मिरची", "ਸ਼ਿਮਲਾ ਮਿਰਚ"),
     "sunflower": ("sunflower", "सूरजमुखी", "सूर्यफूल", "ਸੂਰਜਮੁਖੀ"),
     "peas": ("green peas", "मटर", "वाटाणा", "ਮਟਰ"),
-    "barley": ("barley", "ਜੌਂ"),
+    "barley": ("barley", "जौ", "ਜੌਂ"),
+    "sesame": ("sesame", "til", "तिल", "तीळ", "ਤਿਲ"),
+    "turmeric": ("turmeric", "haldi", "हल्दी", "हळद", "ਹਲਦੀ"),
+    "ginger": ("ginger", "adrak", "अदरक", "आले", "ਅਦਰਕ"),
 }
 
 
