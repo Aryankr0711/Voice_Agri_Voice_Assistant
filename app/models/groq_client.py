@@ -60,6 +60,8 @@ class GroqClient:
         self.timeout = timeout
         self.last_model: Optional[str] = None
         self._dead: set[str] = set()
+        self.request_count: int = 0
+        self.total_chat_latency: float = 0.0
         self._session = requests.Session()
 
     # ── HTTP ──────────────────────────────────────────────────────────────────
@@ -155,7 +157,10 @@ class GroqClient:
         if not content:
             raise GroqError("server", f"{model} returned an empty reply "
                                       f"(finish_reason={choice.get('finish_reason')})")
-        logger.info("Groq chat | %s | %.1fs | %d chars", model, time.time() - t0, len(content))
+        elapsed = time.time() - t0
+        self.request_count += 1
+        self.total_chat_latency += elapsed
+        logger.info("Groq chat | %s | %.1fs | %d chars", model, elapsed, len(content))
         return content
 
     # ── Speech-to-text ────────────────────────────────────────────────────────
