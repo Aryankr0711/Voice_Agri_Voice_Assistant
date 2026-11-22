@@ -1,0 +1,67 @@
+"""Shared state / context object passed through the agent pipeline.
+
+Architecture:  Regional speech → STT → original_text
+               → IndicTrans2 → english_text
+               → Agent/Tools → english_answer
+               → IndicTrans2 → regional_answer
+               → Indic TTS → audio
+"""
+from dataclasses import dataclass, field
+from typing import Optional, List
+
+
+@dataclass
+class AgentState:
+    # ── Input boundary (regional language) ────────────────────────────────────
+    source_language: str = "hi"          # language the question came in: "en" | "hi" | "mr" | "pa"
+    # The language chosen on the page. Every reply is written and spoken in it,
+    # whatever language the question itself was asked in.
+    response_language: str = "hi"
+    original_text: str = ""              # Raw STT output in regional language
+    english_text: str = ""               # IndicTrans2 → English
+
+    # ── Intent / query understanding (English, internal) ──────────────────────
+    intent: str = "unknown"
+    crop: Optional[str] = None
+    crop_stage_days: Optional[int] = None
+    location: Optional[str] = None
+    needs_weather: bool = False
+    needs_scheme: bool = False
+    needs_crop_info: bool = False
+    scheme_query: str = ""               # what to search the scheme documents for
+    # The tool plan the understanding step settled on (needs_* flags, crop,
+    # location, scheme_query). When set, the rule-based ReAct policy follows it
+    # instead of re-reading the question text.
+    tool_plan: Optional[dict] = None
+
+    # ── Tool outputs (all in English) ─────────────────────────────────────────
+    weather_data: Optional[dict] = None
+    crop_data: Optional[dict] = None
+    scheme_docs: List[dict] = field(default_factory=list)
+
+    # ── Output boundary ───────────────────────────────────────────────────────
+    english_answer: str = ""             # LLM answer in English
+    regional_answer: str = ""            # IndicTrans2 English → regional language
+    sources: List[str] = field(default_factory=list)
+
+    # ── Observability ─────────────────────────────────────────────────────────
+    latency: dict = field(default_factory=dict)   # component → seconds
+    trace: List[str] = field(default_factory=list)
+
+    def add_trace(self, msg: str) -> None:
+        self.trace.append(msg)
+
+    def routing_text(self) -> str:
+        """The text the agent should reason over: the English query, plus the
+        farmer's original words when they differ (e.g. a Hindi/Marathi/Punjabi
+        voice transcript). Machine translation of regional speech is often
+        lossy, so keeping the original lets the router still spot the crop,
+        place and topic."""
+        english = (self.english_text or "").strip()
+        original = " ".join((self.original_text or "").split())
+        if original and original != english and not original.isascii():
+            return f"{english} (original: {original})"
+        return english
+
+    def trace_summary(self) -> str:
+        return "\n".join(self.trace)

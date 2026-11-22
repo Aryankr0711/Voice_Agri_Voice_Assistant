@@ -1,0 +1,29 @@
+# Lightweight dependencies for LITE_MODE deploys (Render free tier, 512 MB RAM).
+# NO torch / transformers / sentence-transformers / whisper / faiss.
+#
+# Use on the host with:  pip install -r requirements-lite.txt
+# and set env var:       LITE_MODE=true
+#
+# What works: live weather, crop advice, keyword-based government-scheme
+# search, spoken replies (gTTS) — and, with GROQ_API_KEY set, the microphone
+# plus questions and answers in Hindi / Punjabi / Marathi (Groq's API, called
+# with `requests`: nothing extra to install).
+# What's disabled:  local Whisper, semantic search, the local LLM / translator.
+#
+# gradio is pinned to the version this codebase is developed against; its
+# transitive deps (huggingface_hub, fastapi, uvicorn, …) resolve automatically.
+# The repo pins Python 3.11 via .python-version so every wheel is prebuilt.
+
+python-dotenv>=1.0
+requests>=2.31
+numpy>=1.26
+gradio==6.26.0
+# The web app and its JSON API (versions follow gradio's own pins)
+fastapi
+uvicorn
+python-multipart
+gTTS>=2.5
+# LangChain agent (pure Python, ~25 MB RAM; no torch). Its optional
+# `transformers` import is skipped when transformers isn't installed.
+langchain>=0.3,<0.4
+langchain-core>=0.3,<0.4

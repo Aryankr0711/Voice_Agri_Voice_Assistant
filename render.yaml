@@ -1,0 +1,35 @@
+# Render Blueprint — free "Lite" deploy of the Multilingual Agri AI Agent.
+#
+# Render auto-detects this file. It runs the app in LITE_MODE so it fits the
+# free tier's 512 MB RAM: live weather, crop advice, keyword-based
+# government-scheme search and a spoken reply (gTTS), with no PyTorch.
+# With GROQ_API_KEY set (free, console.groq.com — see DEPLOY.md section C) the
+# microphone is on and questions and answers work in Hindi, Punjabi, Marathi
+# and English. Without it: typed English questions only.
+#
+# The free instance sleeps after ~15 min idle and wakes on the next visit
+# (~30-60 s cold start).
+
+services:
+  - type: web
+    name: multilingual-agri-ai-agent   # → https://multilingual-agri-ai-agent.onrender.com
+    runtime: python
+    plan: free
+    autoDeploy: true                   # every push to main redeploys
+    region: singapore              # closest Render region to India; change if you prefer
+    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements-lite.txt
+    startCommand: python app.py        # web app + JSON API; Gradio screen at /classic
+    healthCheckPath: /api/health
+    envVars:
+      - key: LITE_MODE
+        value: "true"
+      # Python version also pinned by .python-version (3.11.9) at the repo root.
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      # Secrets — entered in the Render dashboard, never stored in the repo.
+      # PRIMARY: Groq (voice/STT + LLM). Get free key at console.groq.com
+      - key: GROQ_API_KEY
+        sync: false
+      # FALLBACK: Google Gemini (LLM chat only). Get free key at aistudio.google.com
+      - key: GEMINI_API_KEY
+        sync: false

@@ -1,0 +1,47 @@
+# Full dependencies — local dev / GPU deploy / Colab.
+# For the free 512 MB host use requirements-lite.txt + LITE_MODE=true instead.
+#
+# Version floors match the stack this codebase is developed against; the host
+# resolves compatible wheels. Repo pins Python 3.11 via .python-version.
+
+# ─── Core ─────────────────────────────────────────────────────────────────────
+python-dotenv>=1.0
+requests>=2.31
+pydantic>=2.7
+
+# ─── UI ───────────────────────────────────────────────────────────────────────
+gradio==6.26.0
+fastapi
+uvicorn
+python-multipart
+
+# ─── Agent (LangChain ReAct AgentExecutor with tool-calling) ──────────────────
+langchain>=0.3,<0.4
+langchain-core>=0.3,<0.4
+
+# ─── ML / Models ──────────────────────────────────────────────────────────────
+torch>=2.4
+torchaudio>=2.4
+transformers>=4.44
+accelerate>=0.34
+sentence-transformers>=3.3
+# NOTE: Whisper STT uses transformers' WhisperForConditionalGeneration — the
+# standalone `openai-whisper` package is NOT needed (and its sdist breaks builds).
+
+# ─── Translation (IndicTrans2 pure-Python shim) ───────────────────────────────
+sentencepiece>=0.2
+indic-nlp-library>=0.92
+sacremoses>=0.2
+
+# ─── RAG ──────────────────────────────────────────────────────────────────────
+faiss-cpu>=1.9
+pymupdf>=1.24
+
+# ─── TTS ──────────────────────────────────────────────────────────────────────
+# gTTS = lightweight default (TTS_ENGINE=gtts). Production Indic voice
+# (TTS_ENGINE=parler): pip install git+https://github.com/ai4bharat/indic-parler-tts
+gTTS>=2.5
+soundfile>=0.12
+
+# ─── Utilities ────────────────────────────────────────────────────────────────
+numpy>=1.26
