@@ -171,8 +171,19 @@ elif not LITE_MODE:
 else:
     STT_ENGINE = "none"
 VOICE_READY: bool = STT_ENGINE != "none"
-# Questions and answers in Hindi / Punjabi / Marathi: Groq LLM, or IndicTrans2.
-REGIONAL_READY: bool = USE_GROQ or not USE_STUB_TRANSLATION
+# Questions and answers in Hindi / Punjabi / Marathi: Groq LLM, Gemini LLM, or IndicTrans2.
+REGIONAL_READY: bool = USE_GROQ or USE_GEMINI or not USE_STUB_TRANSLATION
+
+def get_active_providers() -> dict[str, str | bool]:
+    """Return dictionary of active AI/LLM providers and configured engines."""
+    return {
+        "primary_llm": "groq" if USE_GROQ else "none",
+        "fallback_llm": "gemini" if USE_GEMINI else "none",
+        "stt_engine": STT_ENGINE,
+        "voice_ready": VOICE_READY,
+        "regional_ready": REGIONAL_READY,
+        "lite_mode": LITE_MODE,
+    }
 
 # Human-readable language names keyed by ISO 639-1 code used in the UI
 SUPPORTED_LANGUAGES: dict[str, str] = {
