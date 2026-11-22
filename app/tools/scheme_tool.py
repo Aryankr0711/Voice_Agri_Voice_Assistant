@@ -66,6 +66,7 @@ def get_scheme_context(query: Optional[str]) -> str:
     Takes an English query and returns a formatted string with relevant
     government scheme information, ready to include in the LLM prompt.
     """
+    query = " ".join((query or "").split())
     if not query:
         return "No scheme query provided."
 
